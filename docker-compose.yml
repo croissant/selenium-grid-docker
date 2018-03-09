@@ -1,0 +1,46 @@
+---
+version: '3'
+
+services:
+  hub:
+    image: selenium/hub
+    ports:
+      - 4444:4444
+    networks:
+      local_dev:
+        ipv4_address: 10.0.100.1
+
+  chrome:
+    image: selenium/node-chrome
+    environment:
+      HUB_PORT_4444_TCP_ADDR: hub
+      HUB_PORT_4444_TCP_PORT: 4444
+      NODE_MAX_SESSIONS: 10
+    depends_on:
+      - hub
+    extra_hosts:
+      - "integration.n-pri-dev.jp:10.0.0.160"
+    volumes:
+      - /dev/shm:/dev/shm
+    networks:
+      local_dev:
+        ipv4_address: 10.0.100.2
+
+  firefox:
+    image: selenium/node-firefox
+    environment:
+      HUB_PORT_4444_TCP_ADDR: hub
+      HUB_PORT_4444_TCP_PORT: 4444
+    depends_on:
+      - hub
+    extra_hosts:
+      - "integration.n-pri-dev.jp:10.0.0.160"
+    volumes:
+      - /dev/shm:/dev/shm
+    networks:
+      local_dev:
+        ipv4_address: 10.0.100.3      
+
+networks:
+  local_dev:
+    external: true
